@@ -7,7 +7,9 @@
 	</head>
 
 
-	<script src="Objects.js"></script>
+	<script src="EssayObjects/SourceAndPoint.js"></script>
+    <script src="EssayObjects/Essay.js"></script>
+    <script src="EssayObjects/Argument.js"></script>
 	
 	<div id="leftSideBar">
 		
@@ -147,7 +149,9 @@
 			currentWindowSelected = "Essay Preview";
 		
 			var newHtml = "";
-			newHtml += "<h3 style=\"text-align:center;\" title=\"For a more accurate word count and other cool information, try visiting wordcounter.net and copying and pasting this essay!\">Preview (~<a href=\"http://www.wordcounter.net\" target=\"_blank\"target=\"_blank\"target=\"_blank\">"+essayWorkingOn.getWordCount()+" words</a>)</h3>";
+			newHtml += "<h3 style=\"text-align:center;\" title=\"For a more accurate word count and other cool information,"
+                    + "try visiting wordcounter.net and copying and pasting this essay!\">Preview (~<a href=\"http://www.wordcounter.net\" target=\"_blank\"target=\"_blank\"target=\"_blank\">"
+                    +essayWorkingOn.getWordCount()+" words</a>)</h3>";
 			newHtml+=essayWorkingOn.toFormattedHTML();
 			document.getElementById("editor").innerHTML = newHtml;
 		}
