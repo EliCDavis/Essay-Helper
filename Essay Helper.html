@@ -5,11 +5,6 @@
 		<title>Essay Helper</title>
         <link rel="stylesheet" type="text/css" href="helper.css">
 	</head>
-
-
-	<script src="EssayObjects/SourceAndPoint.js"></script>
-    <script src="EssayObjects/Essay.js"></script>
-    <script src="EssayObjects/Argument.js"></script>
 	
 	<div id="leftSideBar">
 		
@@ -77,12 +72,33 @@
 		</table>
 	</div>
 	
+
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-	<script src = "Objects.js"></script>
+
+    <!-- Importing all Essay Objects -->
+	<script src="EssayObjects/SourceAndPoint.js"></script>
+    <script src="EssayObjects/Essay.js"></script>
+    <script src="EssayObjects/Argument.js"></script>
+    
+    <!-- Importing all Editor Views -->
+    <script src="EditorViews/EditorView.js"></script>
+    <script src="EditorViews/EssayEditView.js"></script>
+    <script src="EditorViews/ArgumentEditView.js"></script>
+    <script src="EditorViews/SourceEditView.js"></script>
+    <script src="EditorViews/EssayView.js"></script>
+
+
 	<script>
 		var essayWorkingOn =  new Essay();
 		var currentWindowSelected = "None";
+        
+        //The four main tabs up top
+        var essayEditView = new EssayEditView();
+        var arguementEditView = new ArgumentEditView();
+        var sourceEditView = new SourceEditView();
+        var essayView = new EssayView();
 		
+        //When the user clicks away from editing their thesis, update the essay object
 		$( "#targetThesis" ).blur(function() {
 			essayWorkingOn.thesis = document.getElementById("targetThesis").value;
 			if(currentWindowSelected == "Essay Preview"){
@@ -90,6 +106,7 @@
 			}
 		});
 		
+        //When the user clicks away from editing their essay title, update the essay object
 		$( "#targetTitle" ).blur(function() {
 			essayWorkingOn.title = document.getElementById("targetTitle").value;
 			if(currentWindowSelected == "Essay Preview"){
@@ -98,311 +115,54 @@
 		});
 		
 		//before rendering something else in the editor view, we should save whatever we where working on in the current view.
-		//This is called by every switch to new view ( such as switchToEssayPreview() )
+		//This is called by every switch to new view
 		function saveCurrentEditorProgress(){
 			
-			if(currentWindowSelected == "Essay Edit"){
-				essayWorkingOn.introductionParagraph = document.getElementById("introduction").value;
-				essayWorkingOn.conclusionParagraph = document.getElementById("conclusion").value;
+			if(currentWindowSelected == essayEditView.getTabName()){
+				essayEditView.saveProgress();
 			}
 			
-			if(currentWindowSelected == "Source Edit"){
-				if(sourceCurrentelyEditing != null && document.getElementById("worksCited") != null){//checking if the text area was even created.  If it wasn't then we weren't editing a point
-				
-					//save sources info
-					sourceCurrentelyEditing.citation = document.getElementById("worksCited").value;
-					sourceCurrentelyEditing.introductionToSource = document.getElementById("introduction").value;
-					
-					//save all of edited points info
-					for(var i = 0; i < sourceCurrentelyEditing.points.length; i ++){
-					
-						//if the points even have corresponding values to assign for
-						if(document.getElementById("point "+sourceCurrentelyEditing.points[i].id) != null && document.getElementById("thought "+sourceCurrentelyEditing.points[i].id) != null){
-							sourceCurrentelyEditing.points[i].content = document.getElementById("point "+sourceCurrentelyEditing.points[i].id).value;
-							sourceCurrentelyEditing.points[i].thoughts = document.getElementById("thought "+sourceCurrentelyEditing.points[i].id).value;
-						}
-					}
-				}
-				updateSourceSideBar();
+            if(currentWindowSelected == sourceEditView.getTabName()){
+				sourceEditView.saveProgress();
 			}
 			
-			if(currentWindowSelected == "Arguement Edit"){
-				
-				if(arguementCurrentelyEditing.transitions != null){
-					for(var i = 0; i < arguementCurrentelyEditing.transitions.length; i ++){
-					
-						if(document.getElementById("transition "+i) != null){
-							arguementCurrentelyEditing.transitions[i] = document.getElementById("transition "+i).value;
-						}
-					}
-				}
-				
-				arguementCurrentelyEditing.topicSentence = document.getElementById("topic").value;
-				arguementCurrentelyEditing.outro = document.getElementById("outro").value;
-				updateArgumentSideBar();
+			if(currentWindowSelected == arguementEditView.getTabName()){
+				arguementEditView.saveProgress();
 			}
 			
+            updateSourceSideBar();
+            updateArgumentSideBar();
+
 		}
 		
+        //for buttons to switch between different views
 		function switchToEssayPreview(){
-			saveCurrentEditorProgress();
-			currentWindowSelected = "Essay Preview";
-		
-			var newHtml = "";
-			newHtml += "<h3 style=\"text-align:center;\" title=\"For a more accurate word count and other cool information,"
-                    + "try visiting wordcounter.net and copying and pasting this essay!\">Preview (~<a href=\"http://www.wordcounter.net\" target=\"_blank\"target=\"_blank\"target=\"_blank\">"
-                    +essayWorkingOn.getWordCount()+" words</a>)</h3>";
-			newHtml+=essayWorkingOn.toFormattedHTML();
-			document.getElementById("editor").innerHTML = newHtml;
+			essayView.switchToThisView();
 		}
-		
-		function swapArguementIndexes(argIndex, direction){
-		
-			if(argIndex+direction < 0 || argIndex+direction > essayWorkingOn.arguements.length-1){
-				return;
-			}
-			
-			var swap = essayWorkingOn.arguements[argIndex];
-			essayWorkingOn.arguements[argIndex] = essayWorkingOn.arguements[argIndex+direction];
-			essayWorkingOn.arguements[argIndex+direction] = swap;
-			switchToEssayEdit();
-		
-		}
-		
 		function switchToEssayEdit(){
-			saveCurrentEditorProgress();
-			currentWindowSelected = "Essay Edit";
-		
-			var newHtml = "";
-			newHtml += "<table border=\"1\" style=\"width:100%;height:100%; border-collapse: collapse; text-align: left;\">";
-				newHtml += "<tr>";
-					newHtml += "<td valign=\"top\"  style=\"width:50%;height:50%\" >Introduction:"
-								+"<textarea id=\"introduction\" style=\"resize:none; width:99%; height:90%;\"></textarea>"
-								+"</td>";
-					newHtml += "<th valign=\"top\" rowspan=\"2\" >Arrange Order Of Arguments:</br>";
-					
-					newHtml += "<table border=\"1\" style=\"width:100%;border-collapse: collapse; text-align: left;\">";
-					for(var i = 0; i < essayWorkingOn.arguements.length; i ++){
-						newHtml += "<tr><td>";
-						newHtml += essayWorkingOn.arguements[i].topicSentence+"</br></br>";
-						
-						if(i != 0){
-							newHtml += "<button type=\"button\" onclick =\"swapArguementIndexes( "+i+",-1)\">^ Move Up ^</button>";
-						}
-						if(i != essayWorkingOn.arguements.length-1){
-							newHtml += "<button style=\"float:right\" type=\"button\" onclick =\"swapArguementIndexes( "+i+",1)\">v Move Down v</button></br>";
-						}
-						
-						newHtml += "</td></tr>";
-					}
-					newHtml += "</table>";
-					
-					newHtml += "</th>";
-				newHtml += "</tr>";
-				newHtml += "<tr>";
-					newHtml += "<td valign=\"top\" style=\"width:50%;height:50%\" >Conclusion:"
-								+"<textarea id=\"conclusion\" style=\"resize:none; width:99%; height:90%;\"></textarea>"
-								+"</td>";
-					newHtml += "<td valign=\"top\"> </td>";
-				newHtml += "</tr>";
-			newHtml += "</table>";
-			document.getElementById("editor").innerHTML = newHtml;
-			document.getElementById("introduction").value = essayWorkingOn.introductionParagraph;
-			document.getElementById("conclusion").value = essayWorkingOn.conclusionParagraph;
+			essayEditView.switchToThisView();
 		}
-		
-		var arguementCurrentelyEditing;
-		var arguementIndexCurrentelyEditing
 		function switchToArguementEdit(arguementToEditNowIndex){
-		
-			saveCurrentEditorProgress();
-			currentWindowSelected = "Arguement Edit";
-		
-			if(arguementToEditNowIndex < 0 && arguementCurrentelyEditing == null){
-				document.getElementById("editor").innerHTML = "Click a arguement to start editing!";
-				return;
-			}
-			
-			if(arguementToEditNowIndex >= 0){
-				arguementCurrentelyEditing = arguementsForButtons[arguementToEditNowIndex];
-				arguementIndexCurrentelyEditing = arguementToEditNowIndex;
-			}
-			
-			
-			if(arguementCurrentelyEditing == null){
-				console.log("arguementCurrentelyEditing == null");
-				return;
-			}
-		
-			var newHtml = "";
-			
-			//enter in your topic sentence
-			newHtml += "Topic Sentence: (<div style=\"display:inline;\" title=\"Enter your topic sentence to your arguement.  Make sure to relate it back to your thesis\">?</div>)</br>";
-			newHtml += "<textarea id=\"topic\" style=\"resize:vertical; width:100%; height:10%;\">"+arguementCurrentelyEditing.topicSentence+"</textarea></br></br></br>";
-			
-			//list of points you can add
-			newHtml += "<table border=\"1\" style=\"width:100%;border-collapse: collapse;\">";
-			newHtml += "<tr>";
-			
-			//list all points and transitions currently included in the argument
-			newHtml += "<td valign=\"top\" style= \"width:50%\">";
-				newHtml += "Points Currentely Listed:</br></br>";
-				
-				// if we actually don't have any points currently listed in the argument
-				if(arguementCurrentelyEditing.points.length == 0){
-					newHtml += "None!";
-				} 
-				else // but if we do have points to list then let's create ANOTHER TABLE :D 
-				{
-					newHtml += "<table border=\"1\" style=\"width:100%;border-collapse: collapse;\">";
-					
-					for(var i = 0; i < arguementCurrentelyEditing.points.length; i ++ ){
-					
-						//add in transitions
-						if(arguementCurrentelyEditing.points.length > 1 && i > 0){
-							newHtml += "<tr>";
-							newHtml += "<td valign=\"top\">";
-							newHtml += "<textarea id=\"transition "+(i-1)+"\" style=\"resize:vertical; width:100%;\" rows=\"4\">"+arguementCurrentelyEditing.transitions[i-1]+"</textarea>";
-							newHtml += "</td></tr>";
-						}
-					
-						//display the point
-						newHtml += "<tr>";
-						newHtml += "<td valign=\"top\">";
-							if(i != 0){
-								newHtml += "<button type=\"button\" onclick =\"swapPointIndexes( "+i+",-1)\">^ Move Up ^</button>";
-							}
-							if(i != arguementCurrentelyEditing.points.length-1){
-								newHtml += "<button style=\"float:right\" type=\"button\" onclick =\"swapPointIndexes( "+i+",1)\">v Move Down v</button></br>";
-							}
-							newHtml += "</br>" + arguementCurrentelyEditing.points[i].toString()+"</br></br>";
-							newHtml += "<button style=\"float: right;\" type=\"button\" onclick =\"deletePointFromCurrentArgument( "+i+")\">Delete Point From Arguement</button></br>"
-						newHtml += "</td></tr>";
-						
-						
-					}
-					newHtml += "</table>";
-				}
-				
-			newHtml += "</td>";
-			
-			
-			newHtml += "<td valign=\"top\" style= \"width:50%\">";
-				newHtml += "Points not listed in other arguements yet:</br>";
-				for(var i = 0; i < essayWorkingOn.getPointsNotUsedByArguements().length; i ++){
-					newHtml += "<button onclick=\"addPointToCurrentArguement("+essayWorkingOn.getPointsNotUsedByArguements()[i].id+")\" style= \"width:100%\">"+essayWorkingOn.getPointsNotUsedByArguements()[i]+"</button></br></br>";
-				}
-			newHtml += "</td>";
-			
-			newHtml += "</tr>";
-			newHtml += "</table></br></br>";
-			
-			//enter in your conclusion sentence
-			newHtml += "Conclusion Sentence: (<div style=\"display:inline;\" title=\"Wrap up what you have to say about your arguement.  Make sure to relate it back to your thesis\">?</div>)</br>";
-			newHtml += "<textarea id=\"outro\" style=\"resize:vertical; width:100%; height:10%;\">"+arguementCurrentelyEditing.outro+"</textarea>";
-			
-			document.getElementById("editor").innerHTML = newHtml;
-			
+            arguementEditView.switchToThisView(arguementToEditNowIndex);
 		}
-		
-		//direction being positive moves it up in the array, making it negative moves it toward zero
-		function swapPointIndexes(pointIndex,direction){
-			
-			if(pointIndex+direction <0 || pointIndex+direction> arguementCurrentelyEditing.points.length-1){
-				return;
-			}
-			
-			var swap = arguementCurrentelyEditing.points[pointIndex];
-			arguementCurrentelyEditing.points[pointIndex] = arguementCurrentelyEditing.points[pointIndex+direction];
-			arguementCurrentelyEditing.points[pointIndex+direction] = swap;
-			switchToArguementEdit(arguementIndexCurrentelyEditing);
-		
-		}
-		
-		//creates an empty point and adds it to the current argument we're working on
-		function addPointToCurrentArguement(pointID){
-			if(arguementCurrentelyEditing != null){
-				for(var i = 0; i <  essayWorkingOn.getPointsNotUsedByArguements().length; i ++){
-					if(essayWorkingOn.getPointsNotUsedByArguements()[i].id == pointID){
-						arguementCurrentelyEditing.addPoint(essayWorkingOn.getPointsNotUsedByArguements()[i]);
-					}
-				}
-			}
-			
-			switchToArguementEdit(arguementIndexCurrentelyEditing);
-		}
-		
-		//safely removes point from the current argument in a way to avoid errors because I've made this weird. Blame lack of IDs.
-		function deletePointFromCurrentArgument(pointIndex){
-			switchToEssayPreview();
-			arguementCurrentelyEditing.removePoint(pointIndex);
-			switchToArguementEdit(arguementIndexCurrentelyEditing);
-		}
-		
-		var sourceCurrentelyEditing;
-		var sourceIndexCurrentelyEditing;
 		function switchToSourceEdit(sourceToEditNow){
-			
-			saveCurrentEditorProgress();
-			currentWindowSelected = "Source Edit";
-			
-			if(sourceToEditNow < 0 && sourceCurrentelyEditing == null){
-				document.getElementById("editor").innerHTML = "Click a source to start editing!";
-				return;
-			}
-			
-			if(sourceToEditNow >=0){
-				sourceCurrentelyEditing = sourcesForButtons[sourceToEditNow];
-				sourceIndexCurrentelyEditing = sourceToEditNow;
-			}
-			
-			if(sourceCurrentelyEditing == null){
-				console.log("sourceCurrentelyEditing == null");
-				return;
-			}
-			
-			//build basic text boxes for inputting citation and introduction to source
-			var newHtml = "Citation: (<a href=\"http://www.easybib.com/\" target=\"_blank\" title=\"Want a quick citation? Try visiting easybib.com!\">?</a>)</br>";
-			newHtml += "<textarea id=\"worksCited\" style=\"resize:vertical; width:100%; height:10%;\">"+sourceCurrentelyEditing.citation+"</textarea>";
-			newHtml += "Introduction to source: (<div target=\"_blank\" style=\"display:inline;\" title=\"You need to introduce your source before you use it!  This text will show up"+
-						" before the use of your first point, no need to manually add it in!  If you don't want one to show up or want to manually add it in, make a note to yourself"+
-						" that after you've exported this essay to add it in and leave this section blank.\">?</div>)</br>";
-			newHtml += "<textarea id=\"introduction\" style=\"resize:vertical; width:100%; height:10%;\">"+sourceCurrentelyEditing.introductionToSource+"</textarea>";
-			newHtml += "</br></br><div style=\"text-align:center;\"><button type=\"button\"  onclick=\"createNewPoint();\">Create New Point</button></div></br></br>"; 
-			
-			//for each point, build it a box to enter in the point, and it's contents!
-			for(var i = 0; i < sourceCurrentelyEditing.points.length; i ++){
-				newHtml += "Point: (<div title=\"This is where you enter the quote and lead in sentence! The @INTEXT@ is where you want your in-text citation to show up!\" style=\"display:inline;\">?</div>)";
-				newHtml += "<textarea id=\"point "+sourceCurrentelyEditing.points[i].id+"\" style=\"resize:vertical; width:100%; height:10%;\">"+sourceCurrentelyEditing.points[i].content+"</textarea></br>";
-				newHtml += "Thoughts: (<div style=\"display:inline;\" title=\"This is where you extrapolate on your point! Give your thoughts, what it means in reguard to your thesis, etc.\">?</div>)";
-				newHtml += "<textarea id=\"thought "+sourceCurrentelyEditing.points[i].id+"\" style=\"resize:vertical; width:100%; height:10%;\">"+sourceCurrentelyEditing.points[i].thoughts+"</textarea></br>";
-				newHtml += "<button  type=\"button\"  onclick=\"deletePoint("+i+");\">Delete Point</button></br></br></br>";
-			}
-			
-			newHtml += "</br></br><button type=\"button\"  onclick=\"deleteSource("+sourceIndexCurrentelyEditing+")\";\>Delete Source</button>";
-			
-			document.getElementById("editor").innerHTML = newHtml;
+			sourceEditView.switchToThisView(sourceToEditNow);
 		}
 		
+        
+        //add an arguement to the current essay we're working on
 		function addArgument(){
 			essayWorkingOn.arguements[essayWorkingOn.arguements.length] = new Argument();
 			updateArgumentSideBar();
 			switchToArguementEdit(essayWorkingOn.arguements.length-1);
-			
 		}
 		
-		
-		var arguementsForButtons = [];
-		function updateArgumentSideBar(){
-			var newHtml = "";
-			newHtml += "<table border=\"0\" style=\"width:100%;height:100%; border-collapse: collapse; text-align: left;\">";
-			for(var i = 0; i < essayWorkingOn.arguements.length; i ++){
-				newHtml += "<tr><td><button type=\"button\"  onclick=\"switchToArguementEdit("+i+");\" style=\"width:98%;\">"+essayWorkingOn.arguements[i].topicSentence+"</button></td></tr>";
-				arguementsForButtons[i] = essayWorkingOn.arguements[i];
-			}
-			newHtml += "</table>";
-			document.getElementById("argSide").innerHTML = newHtml;
-		}
+        //deletes an arguement from the essay we're currentely working on
+        function deleteArgument(arguementIndex){
+            switchToEssayPreview();
+			essayWorkingOn.deleteArgument(arguementIndex);
+            updateArgumentSideBar();
+        }
 		
 		//add a source to the current essay we're working on
 		function addSource(){
@@ -413,14 +173,26 @@
 		
 		//deletes the source from the essay we're currentely working on
 		function deleteSource(sourceIndex){
-			sourceCurrentelyEditing = null;
-			essayWorkingOn.deleteSource(sourceIndex);
-			sourceIndex = -1;
 			switchToEssayPreview();
-			updateSourceSideBar();
+			essayWorkingOn.deleteSource(sourceIndex);
+            updateSourceSideBar();
 		}
+        
 		
-		
+		//updates the buttons of the left side bar that link to the different arguements
+        var arguementsForButtons = [];
+		function updateArgumentSideBar(){
+			var newHtml = "";
+			newHtml += "<table border=\"0\" style=\"width:100%;height:100%; border-collapse: collapse; text-align: left;\">";
+			for(var i = 0; i < essayWorkingOn.arguements.length; i ++){
+				newHtml += "<tr><td><button type=\"button\"  onclick=\"switchToArguementEdit("+i+");\" style=\"width:98%;\">"+essayWorkingOn.arguements[i].topicSentence+"</button></td></tr>";
+				arguementsForButtons[i] = essayWorkingOn.arguements[i];
+			}
+			newHtml += "</table>";
+			document.getElementById("argSide").innerHTML = newHtml;
+		}
+        
+        //updates the buttons on the right side bar that link to the different arguements
 		var sourcesForButtons = [];
 		function updateSourceSideBar(){
 			sourcesForButtons = [];
@@ -433,38 +205,6 @@
 			newHtml += "</table>";
 			document.getElementById("sourceSide").innerHTML = newHtml;
 		}
-		
-		//adds a new point to the current source we're editing
-		function createNewPoint(){
-			
-			if(sourceCurrentelyEditing != null){
-			
-				//add the source from the point we're trying to edit
-				sourceCurrentelyEditing.createNewPoint();
-				
-				//need to refresh to show changes
-				switchToSourceEdit(sourceIndexCurrentelyEditing);
-				
-			}
-		
-		}
-		
-		//deletes the point from the source we're currently editing
-		function deletePoint(pointIndex){
-
-			//if we're even editing a source
-			if(sourceCurrentelyEditing != null){
-			
-				//delete the point from the source we're trying to edit
-				sourceCurrentelyEditing.deletePoint(pointIndex);
-				
-				//need to refresh to show changes
-				switchToSourceEdit(sourceIndexCurrentelyEditing);
-				
-			}
-			
-		}
-		
 		
 	</script>
 	

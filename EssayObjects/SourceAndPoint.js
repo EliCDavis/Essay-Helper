@@ -38,6 +38,10 @@ function Source(title){
 	
 	//for website references
 	this.url;
+    
+    //easier comparison between sources
+    this.id = Date.now();
+    
 }
 
 function Point(source,thoughts){

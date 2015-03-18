@@ -61,6 +61,24 @@ function Essay(){
 		this.sources.remove(sourceIndex);
 	}
 	
+    this.containsSource = function(source){
+        
+        if(source == null){
+            return false;   
+        }
+        
+        for(var i = 0; i < this.sources.length; i ++){
+            if(this.sources[i].id == source.id){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    this.deleteArgument = function(argumentIndex){
+        this.arguements.remove(argumentIndex);
+    }
+    
 	this.getPointsNotUsedByArguements = function(){
 		
 		var newPoints = [];
