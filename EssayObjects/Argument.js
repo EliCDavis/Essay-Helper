@@ -13,8 +13,8 @@ function Argument(){
 			return;
 		}
 		
-		this.points[this.points.length] = pointToAdd;
-		if(this.points.length>0){
+		this.points.push(pointToAdd);
+		if(this.points.length > 1) {
 			this.transitions[this.transitions.length] = "[Enter Transition Here]";
 		}
 	}
@@ -97,7 +97,7 @@ function Argument(){
 	}
 	
 	//returns what sources have been used in this argument
-	this.sourcesUsedInArguement = function(){
+	this.sourcesUsedInArguement = function() {
 		var sources = [];
 		for(var i = 0; i < this.points.length; i ++){
 			

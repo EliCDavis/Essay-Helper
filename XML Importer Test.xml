@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<Essay>
+    <Title>The Test Title</Title>
+    <Thesis>A Test Thesis</Thesis>
+    <Intro>Introduction Test. @THESIS@  Another Sentence.</Intro>
+    <Conclusion>Conclusion Test</Conclusion>
+    <Sources>
+        <Source>
+            <Citation>1</Citation>
+            <IntrotoSource>You need to introduce your source at some point throughout the essay! Delete this if you don't want one!</IntrotoSource>
+            <DateAccessed>1426706919019</DateAccessed>
+            <Points>
+                <Point>
+                    <ID>1426706942066</ID>
+                    <Content>1 Your point @INTEXT@.</Content>
+                    <Thoughts>0</Thoughts>
+                </Point>
+                <Point>
+                    <ID>1426706942532</ID>
+                    <Content>1 Your point @INTEXT@.</Content>
+                    <Thoughts>1</Thoughts>
+                </Point>
+                <Point>
+                    <ID>1426706946165</ID>
+                    <Content>1 Your point @INTEXT@.</Content>
+                    <Thoughts>2</Thoughts>
+                </Point>
+            </Points>
+        </Source>
+        <Source>
+            <Citation>2</Citation>
+            <IntrotoSource>intro 2</IntrotoSource>
+            <DateAccessed>1426706924934</DateAccessed>
+            <Points>
+                <Point>
+                    <ID>1426706949981</ID>
+                    <Content>2 Your point @INTEXT@.</Content>
+                    <Thoughts>0</Thoughts>
+                </Point>
+                <Point>
+                    <ID>1426706950297</ID>
+                    <Content>2 Your point @INTEXT@.</Content>
+                    <Thoughts>1</Thoughts>
+                </Point>
+            </Points>
+        </Source>
+    </Sources>
+    <Arguments>
+        <Argument>
+            <ID>1426706877736</ID>
+            <Topic>Topic Sentence Test 11111111111111</Topic>
+            <Outro>Outro Sentence Test 11111111111111</Outro>
+            <Points>
+                <ID>1426706942532</ID>
+                <ID>1426706950297</ID>
+            </Points>
+            <Transitions>
+                <Transition>Transition between 1</Transition>
+            </Transitions>
+        </Argument>
+        <Argument>
+            <ID>1426706901403</ID>
+            <Topic>Topic Sentence Test 22222222222222222</Topic>
+            <Outro>Outro Sentence Test 22222222222222222</Outro>
+            <Points>
+                <ID>1426706942066</ID>
+            </Points>
+            <Transitions>
+            </Transitions>
+        </Argument>
+    </Arguments>
+</Essay>

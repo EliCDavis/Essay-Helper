@@ -2,6 +2,8 @@
 <html>
 	
 	<head>
+        <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+        <meta content="utf-8" http-equiv="encoding">
 		<title>Essay Helper</title>
         <link rel="stylesheet" type="text/css" href="helper.css">
 	</head>
@@ -15,9 +17,11 @@
 			<tr>
 				<td  valign="top" style="width:98%; height:10%" >
 					<h3>Options</h3>
-					Save:</br>
-					<button>Save As...</button></br></br>
-					Load:<input type="file" name="load" accept="xml">
+					Save: </br>
+					<button type ="button" id="Essay Save Button" onclick=exportToXML()>Save As...</button></br>
+                    
+                    </br>Load:<input type="file" name="load" accept="xml" id="essayXMLLoad"></br></br>
+                    <button type ="button" onclick=loadFileAsText()>Load</button>
 				</td>
 			</tr>
 			
@@ -72,8 +76,11 @@
 		</table>
 	</div>
 	
-
+    <!-- Importing Useful bits -->
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="Conversions/XML-Writer.js"></script>
+    <script src="Conversions/xmlToJSON.js"></script>
+    <script src="SaveAndLoad.js"></script>
 
     <!-- Importing all Essay Objects -->
 	<script src="EssayObjects/SourceAndPoint.js"></script>
@@ -91,6 +98,59 @@
 	<script>
 		var essayWorkingOn =  new Essay();
 		var currentWindowSelected = "None";
+        
+        //https://thiscouldbebetter.wordpress.com/2012/12/18/loading-editing-and-saving-a-text-file-in-html5-using-javascrip/
+        function exportToXML(){
+            var xml = getXML(essayWorkingOn);
+            var blob = new Blob([xml], {type : 'text/xml'}); // the blob
+            
+            var downloadLink = document.createElement("a");
+	        downloadLink.download = essayWorkingOn.title;
+            downloadLink.innerHTML = "Download File";
+            if (window.webkitURL != null)
+            {
+                // Chrome allows the link to be clicked
+                // without actually adding it to the DOM.
+                downloadLink.href = window.URL.createObjectURL(blob);
+            } else {
+                // Firefox requires the link to be added to the DOM
+                // before it can be clicked.
+                downloadLink.href = window.URL.createObjectURL(blob);
+                
+                downloadLink.onclick = destroyClickedElement;
+                downloadLink.style.display = "none";
+                document.body.appendChild(downloadLink);
+            }
+
+            downloadLink.click();
+        }
+        
+        function destroyClickedElement(event)
+        {
+            document.body.removeChild(event.target);
+        }
+        
+        function loadFileAsText()
+        {
+            var fileToLoad = document.getElementById("essayXMLLoad").files[0];
+
+            var fileReader = new FileReader();
+            fileReader.onload = function(fileLoadedEvent) 
+            {
+                var textFromFileLoaded = fileLoadedEvent.target.result;
+                essayWorkingOn = getEssayObject(textFromFileLoaded);
+                updateSourceSideBar();
+                updateArgumentSideBar();
+                essayView.render();
+            };
+            fileReader.readAsText(fileToLoad, "UTF-8");
+        }
+        
+        function getXMLBlob(){
+            var xml = getXML(essayWorkingOn);
+            var blob = new Blob([xml], {type : 'text/xml'}); // the blob
+            return window.URL.createObjectURL(blob);
+        }
         
         //The four main tabs up top
         var essayEditView = new EssayEditView();

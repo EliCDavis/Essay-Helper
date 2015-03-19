@@ -7,12 +7,26 @@ function Source(title){
 	
 	//before you even can use a source you need to provide an brief introduction to it!
 	this.introductionToSource = "You need to introduce your source at some point throughout the essay! Delete this if you don't want one!";
+    
+    //the citation information entered manually by the user of the application.  what worksCited() defaults to when no citation formatting is provided.
+	this.citation = "Citation";
+	
+	//the date the source was created, generally used for date accessed
+	this.dateAccessed = new Date();
+	
+	//for website references
+	this.url;
+    
+    //easier comparison between sources
+    this.id = Date.now();
+    
 	
 	//Just an easy way to add some points.
 	this.createNewPoint = function(){
 		this.points[this.points.length] = new Point(this,this.points.length);
 	}
 	
+    //removes the certain point from source
 	this.deletePoint = function(indexOfPoint){
 		this.points.remove(indexOfPoint);
 	}
@@ -24,24 +38,28 @@ function Source(title){
 	
 	//while writing the essay and using sources, your required to source where it came from ex: "cause I said so"(Freud 93), this provides the Freud
 	this.inTextCitation = function(formatting){
-		if(this.worksCited() !== null &&this.worksCited() !== ""){
-			return this.worksCited().split(" ")[0];
+        
+		if(this.worksCited() !== null && this.worksCited() !== "" ){
+            
+            return this.worksCited().split(" ")[0];
+            
 		}
+        
 		return "<b><u>Need Citation!</u></b>";
 	}
 	
-	//the citation information entered manually by the user of the application.  what worksCited() defaults to when no citation formatting is provided.
-	this.citation = "Citation";
-	
-	//the date the source was created, generally used for date accessed, also can be used as an id
-	this.dateAccessed = new Date();
-	
-	//for website references
-	this.url;
-    
-    //easier comparison between sources
-    this.id = Date.now();
-    
+    this.getPointOfID = function(pointID){
+        
+        for(var i = 0; i < this.points.length; i ++){
+            if(this.points[i].id == pointID){
+                return this.points[i];
+            }
+            
+        }
+        
+        return null;
+    }
+
 }
 
 function Point(source,thoughts){

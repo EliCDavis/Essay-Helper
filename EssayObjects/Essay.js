@@ -57,6 +57,10 @@ function Essay(){
 		return  essay.match(/(\w+)/g).length;
 	}
 	
+    this.newSource = function(){
+        this.sources.push(new Source());
+    }
+    
 	this.deleteSource = function(sourceIndex){
 		this.sources.remove(sourceIndex);
 	}
@@ -75,6 +79,12 @@ function Essay(){
         return false;
     }
     
+    //creates and empty Argument object and adds it to the essay
+    this.newArgument = function(){
+        this.arguements.push(new Argument());
+    }
+    
+    //deletes the arguement at the index passed in
     this.deleteArgument = function(argumentIndex){
         this.arguements.remove(argumentIndex);
     }
