@@ -6,6 +6,9 @@ be a good project to recreate for the web and open source in hopes of helping ot
 
 This is best used for writers who love filling out forms.
 
+## Set up
+For those who don't want to bother extending it and just want to use the tool, an easy way to get to using it is downloading the zip file to your computer and extracting the files. When your in the extracted folder, just open the Essay Helper html file in your prefered web browser.
+
 ## How to Use
 Admittedly, this program is not intuitive at all to use what so ever.
 So I guess I better explain how it works here in the very least.
